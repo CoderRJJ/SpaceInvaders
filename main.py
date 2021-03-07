@@ -1,47 +1,89 @@
 import pygame
+import numpy as np
 
 Width = 500         # Windows width
 Height = 500        # Window height
 BGColor = (0,0,0)   # Window background color
-DisplaySpeed = 10   # Display update speed
-Running = True      # True to keep running else exit
-PlayerSpd = 1       # Player velocity
-PlayerLives = 3      # Player lives
 
 # Set up the main window
 pygame.font.init()
-Font = pygame.font.SysFont("Courier", 24)
+Font = pygame.font.SysFont("Courier", 18)
 pygame.init()
 Screen = pygame.display.set_mode((Width, Height))
 Screen.fill((BGColor))
 game_icon = pygame.image.load('assets/SpaceInvader.png')
 pygame.display.set_icon(game_icon)
 pygame.display.set_caption("Space Invaders")
-
 # Load the graphics
-PlayerSprite = pygame.image.load('assets/Ship@2x.png')
+PlayerSprite = pygame.image.load('assets/Ship.png')
+InvaderAA = pygame.image.load('assets/InvaderA_00.png'); InvaderAB = pygame.image.load('assets/InvaderA_01.png')
+InvaderBA = pygame.image.load('assets/InvaderB_00.png'); InvaderBB = pygame.image.load('assets/InvaderB_01.png')
+InvaderCA = pygame.image.load('assets/InvaderC_00.png'); InvaderCB = pygame.image.load('assets/InvaderC_01.png')
 
-def RedrawWindow():
-    Screen.fill((BGColor))
-    LivesLabel = Font.render("Lives : "+str(PlayerLives), 1, (255,255,255))
+class Invaders:
+    def __init__(self):
+        self.Population=None
 
-    Screen.blit(LivesLabel, (10,10))
-    Screen.blit(PlayerSprite, (50,Height-35))
-    pygame.display.update()
+    def Init(self):
+        self.Population = np.array([
+            [True, True, True, True, True, True, True, True, True, True],
+            [True, True, True, True, True, True, True, True, True, True],
+            [True, True, True, True, True, True, True, True, True, True],
+            [True, True, True, True, True, True, True, True, True, True],
+            [True, True, True, True, True, True, True, True, True, True]
+        ])
 
-# Loop until the window is closes
-while Running:
-    pygame.display.flip()
-    pygame.time.wait(DisplaySpeed)  # Higher for slower animation
+    def Draw(self, scn, X, Y, Anim):
+        for y in range(0, 5):
+            for x in range(0 , 10):
+                if (self.Population[y,x]):
+                    if (y==0):
+                        if (Anim): DrawInvader = InvaderCA
+                        else: DrawInvader = InvaderCB
+                    elif (y==1):
+                        if (Anim): DrawInvader = InvaderBA
+                        else: DrawInvader = InvaderBB
+                    else:
+                        if (Anim): DrawInvader = InvaderAA
+                        else: DrawInvader = InvaderAB
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            Running = False
+                    scn.blit(DrawInvader, (X+(x*30), Y+(y*20)))
 
-    keys = pygame.key.get_pressed()
-    if (keys[pygame.K_a] and Ship.x - PlayerSpd > 0):
-        Ship.x -= PlayerSpd
-    if (keys[pygame.K_d] and Ship.x + PlayerSpd < Width):
-        Ship.x += PLayerSpd
 
-    RedrawWindow()
+def Main():
+    DisplaySpeed = 100  # Display update speed
+    Running = True     # True to keep running else exit
+    PlayerSpd = 5      # Player velocity
+    PlayerLives = 3    # Player lives
+    PlayerX = int(Width/2)
+    InvaderAnim = True
+
+    MyInvaders=Invaders()
+    MyInvaders.Init()
+
+    # Loop until the window is closes
+    while Running:
+        pygame.display.flip()
+        pygame.time.wait(DisplaySpeed)  # Higher for slower animation
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                Running = False
+
+        keys = pygame.key.get_pressed()
+        if (keys[pygame.K_a] and PlayerX - PlayerSpd > 0):
+            PlayerX -= PlayerSpd
+        if (keys[pygame.K_d] and PlayerX + PlayerSpd < (Width-32)):
+            PlayerX += PlayerSpd
+
+        Screen.fill((BGColor))
+        LivesLabel = Font.render("Lives : " + str(PlayerLives), 1, (255, 255, 255))
+
+        Screen.blit(LivesLabel, (10, 10))
+        Screen.blit(PlayerSprite, (PlayerX, Height - 20))
+        MyInvaders.Draw(Screen, 20,50, InvaderAnim)
+        pygame.display.update()
+
+        InvaderAnim = not InvaderAnim
+
+Main()

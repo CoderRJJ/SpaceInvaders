@@ -5,6 +5,7 @@ Height = 500        # Window height
 BGColor = (0,0,0)   # Window background color
 DisplaySpeed = 10   # Display update speed
 Running = True      # True to keep running else exit
+PlayerSpd = 1
 
 # Set up the main window
 pygame.init()
@@ -24,7 +25,7 @@ while Running:
             Running = False
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.k_a] and Ship.x - PlayerSpd > 0
+    if (keys[pygame.K_a] and Ship.x - PlayerSpd > 0):
         Ship.x -= PlayerSpd
-    if keys[pygame.k_d] and Ship.x + PlayerSpd < Width
+    if (keys[pygame.K_d] and Ship.x + PlayerSpd < Width):
         Ship.x += PLayerSpd
